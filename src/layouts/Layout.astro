@@ -1,6 +1,6 @@
 ---
 interface Props {
-	title: string;
+  title: string;
 }
 
 const { title } = Astro.props;
@@ -8,43 +8,125 @@ const { title } = Astro.props;
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content="Astro description" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="description" content="Astro description" />
+  <meta name="viewport" content="width=device-width" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>{title}</title>
+</head>
+<body>
+  <slot />
+</body>
 </html>
 <style is:global>
-	:root {
-		--accent: 136, 58, 234;
-		--accent-light: 224, 204, 250;
-		--accent-dark: 49, 10, 101;
-		--accent-gradient: linear-gradient(
-			45deg,
-			rgb(var(--accent)),
-			rgb(var(--accent-light)) 30%,
-			white 60%
-		);
-	}
-	html {
-		font-family: system-ui, sans-serif;
-		background: #13151a;
-	}
-	code {
-		font-family:
-			Menlo,
-			Monaco,
-			Lucida Console,
-			Liberation Mono,
-			DejaVu Sans Mono,
-			Bitstream Vera Sans Mono,
-			Courier New,
-			monospace;
-	}
+  :root {
+  --md-sys-color-primary: rgb(255, 249, 249);
+  --md-sys-color-surface-tint: rgb(255, 179, 174);
+  --md-sys-color-on-primary: rgb(0, 0, 0);
+  --md-sys-color-primary-container: rgb(255, 185, 181);
+  --md-sys-color-on-primary-container: rgb(0, 0, 0);
+  --md-sys-color-secondary: rgb(252, 250, 255); 
+  --md-sys-color-on-secondary: rgb(0, 0, 0);
+  --md-sys-color-secondary-container: rgb(190, 200, 255);
+  --md-sys-color-on-secondary-container: rgb(0, 0, 0);
+  --md-sys-color-tertiary: rgb(234, 255, 254);
+  --md-sys-color-on-tertiary: rgb(0, 0, 0);
+  --md-sys-color-tertiary-container: rgb(132, 217, 217);
+  --md-sys-color-on-tertiary-container: rgb(0, 0, 0);
+  --md-sys-color-error: rgb(255, 249, 249);
+  --md-sys-color-on-error: rgb(0, 0, 0);
+  --md-sys-color-error-container: rgb(255, 186, 177);
+  --md-sys-color-on-error-container: rgb(0, 0, 0);
+  --md-sys-color-background: rgb(26, 17, 17);
+  --md-sys-color-on-background: rgb(241, 222, 221);
+  --md-sys-color-surface: rgb(14, 21, 20);
+  --md-sys-color-on-surface: rgb(255, 255, 255);
+  --md-sys-color-surface-variant: rgb(63, 72, 74);
+  --md-sys-color-on-surface-variant: rgb(243, 252, 254);
+  --md-sys-color-outline: rgb(195, 204, 206);
+  --md-sys-color-outline-variant: rgb(195, 204, 206);
+  --md-sys-color-shadow: rgb(0, 0, 0);
+  --md-sys-color-scrim: rgb(0, 0, 0);
+  --md-sys-color-inverse-surface: rgb(221, 228, 227);
+  --md-sys-color-inverse-on-surface: rgb(0, 0, 0);
+  --md-sys-color-inverse-primary: rgb(78, 23, 23);
+  --md-sys-color-primary-fixed: rgb(255, 224, 221);
+  --md-sys-color-on-primary-fixed: rgb(0, 0, 0);
+  --md-sys-color-primary-fixed-dim: rgb(255, 185, 181);
+  --md-sys-color-on-primary-fixed-variant: rgb(51, 4, 6);
+  --md-sys-color-secondary-fixed: rgb(227, 229, 255);
+  --md-sys-color-on-secondary-fixed: rgb(0, 0, 0);
+  --md-sys-color-secondary-fixed-dim: rgb(190, 200, 255);
+  --md-sys-color-on-secondary-fixed-variant: rgb(1, 16, 70);
+  --md-sys-color-tertiary-fixed: rgb(160, 245, 245);
+  --md-sys-color-on-tertiary-fixed: rgb(0, 0, 0);
+  --md-sys-color-tertiary-fixed-dim: rgb(132, 217, 217);
+  --md-sys-color-on-tertiary-fixed-variant: rgb(0, 26, 26);
+  --md-sys-color-surface-dim: rgb(14, 21, 20);
+  --md-sys-color-surface-bright: rgb(52, 58, 58);
+  --md-sys-color-surface-container-lowest: rgb(9, 15, 15);
+  --md-sys-color-surface-container-low: rgb(22, 29, 29);
+  --md-sys-color-surface-container: rgb(26, 33, 33);
+  --md-sys-color-surface-container-high: rgb(37, 43, 43);
+  --md-sys-color-surface-container-highest: rgb(47, 54, 54);
+}
+
+html {
+  font-family: system-ui, sans-serif;
+  background: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-background);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--md-sys-color-on-surface);
+}
+
+p, span, div {
+  color: var(--md-sys-color-on-background);
+}
+
+a {
+  color: var(--md-sys-color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--md-sys-color-surface-tint);
+}
+
+button {
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--md-sys-color-surface-container-high);
+}
+
+input, textarea {
+  background-color: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+  border: 1px solid var(--md-sys-color-outline);
+  padding: 10px;
+  border-radius: 4px;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--md-sys-color-outline-variant);
+}
+
+code {
+  font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+  background-color: var(--md-sys-color-surface-container);
+  padding: 5px;
+  border-radius: 3px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
 </style>
