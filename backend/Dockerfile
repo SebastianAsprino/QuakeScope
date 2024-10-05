@@ -1,7 +1,7 @@
 FROM python:3-alpine AS builder
  
 WORKDIR /app
- 
+
 RUN python3 -m venv venv
 ENV VIRTUAL_ENV=/app/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
