@@ -1,0 +1,24 @@
+---
+import { Image } from 'astro:assets';
+import QuakeScopeLowWhite from "@assets/Brand/QuakeScopeReducedWhiteVersionLowQuality.webp"
+import QuakeScopeLowBlack from "@assets/Brand/QuakeScopeReducedBlackVersionLowQuality.webp"
+import QuakeScopeHighWhite from "@assets/Brand/QuakeScopeReducedWhiteVersionHighQuality.webp"
+import QuakeScopeHighBlack from "@assets/Brand/QuakeScopeReducedBlackVersionHighQuality.webp"
+interface Props {
+    quality: "low" | "medium" | "high";
+    version: "white" | "black";
+    type: "min" | "full";
+    width?: number; 
+}
+
+const { quality, version, type, width } = Astro.props;
+
+
+---
+
+
+{quality === "low" && version === "white" && <Image src={QuakeScopeLowWhite} alt="QuakeScopeWhite" width={width}/>}
+{quality === "low" && version === "black" && <Image src={QuakeScopeLowBlack} alt="QuakeScopeBlack" width={width}/> }
+{quality === "high" && version === "white" && <Image src={QuakeScopeHighWhite} alt="QuakeScopeWhite" width={width}/>}
+{quality === "high" && version === "black" && <Image src={QuakeScopeHighBlack} alt="QuakeScopeBlack" width={width}/> }
+
