@@ -17,6 +17,9 @@ FROM python:3-alpine AS runner
 WORKDIR /
  
 COPY --from=builder /venv venv
+
+COPY ./ ./
+
 COPY main.py main.py
  
 ENV VIRTUAL_ENV=/venv
