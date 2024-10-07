@@ -1,0 +1,134 @@
+---
+interface Props {
+  planet?: "mars" | "moon";
+
+}
+const { planet } = Astro.props;
+---
+
+
+
+<style>
+  
+</style>
+<script>
+  import Chart from "chart.js/auto";
+  import luna1 from "../../assets/luna/xa.s16.00.mhz.1973-08-25HR00_evid00443.json";
+
+  let chartInstance: Chart | null = null;
+
+  const options = {
+    luna: {
+      luna1: luna1,
+      luna2: { time: [1, 2, 3, 4], vel: [10, 20, 30, 40], sismo_start: 2, sismo_end: 4 },
+      luna3: { time: [2, 4, 6, 8], vel: [5, 15, 25, 35], sismo_start: 3, sismo_end: 6 },
+    },
+    marte: {
+      marte1: "marte1",
+    },
+  };
+
+  const lunaOptions = Object.keys(options.luna);
+  let selectedOption = options.luna.luna1;
+
+  function handleSelectChange(event: Event) {
+    const selectElement = event.target as HTMLSelectElement;
+    const selectedValue = selectElement.value;
+    // @ts-ignore
+    selectedOption = options.luna[selectedValue];
+    updateChart();
+  }
+
+  function updateChart() {
+    const lineCanvas = document.getElementById("myChart") as HTMLCanvasElement | null;
+
+    if (lineCanvas) {
+      const ctx = lineCanvas.getContext("2d");
+
+      if (ctx) {
+        // Destruir el gráfico anterior si existe
+        if (chartInstance) {
+          chartInstance.destroy();
+        }
+
+        const config: any = {
+          type: "line",
+          data: {
+            labels: selectedOption.time,
+            datasets: [
+              {
+                label: "Luna",
+                data: selectedOption.vel,
+                fill: false,
+                borderColor: "rgba(255, 99, 132, 1)",
+                pointRadius: 0,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: "Seismic Luna",
+              },
+            },
+          },
+          plugins: [
+            {
+              afterDraw: (chart: any) => {
+                const ctx = chart.ctx;
+                const xAxis = chart.scales.x;
+                const yAxis = chart.scales.y;
+
+                const sismoStart = selectedOption.time.findIndex(
+                  (time: number) => time === selectedOption.sismo_start
+                );
+                const sismoEnd = selectedOption.time.findIndex(
+                  (time: number) => time === selectedOption.sismo_end
+                );
+                const indices = [sismoStart, sismoEnd];
+
+                if (indices.length > 0 && xAxis) {
+                  indices.forEach((index: number) => {
+                    const xValue = selectedOption.time.find(
+                      (time: number) => time >= index
+                    );
+
+                    if (xValue !== undefined) {
+                      const pixelPosition = xAxis.getPixelForValue(xValue);
+                      ctx.save();
+                      ctx.beginPath();
+                      ctx.moveTo(pixelPosition, yAxis.top);
+                      ctx.lineTo(pixelPosition, yAxis.bottom);
+                      ctx.strokeStyle = "red";
+                      ctx.lineWidth = 2;
+                      ctx.stroke();
+                      ctx.restore();
+                    }
+                  });
+                }
+              },
+            },
+          ],
+        };
+
+        // Crear una nueva instancia del gráfico y guardarla
+        chartInstance = new Chart(ctx, config);
+      }
+    }
+  }
+
+  const selectElement = document.getElementById("slct") as HTMLSelectElement;
+
+  lunaOptions.forEach((optionKey) => {
+    const optionElement = document.createElement("option");
+    optionElement.value = optionKey;
+    optionElement.textContent = optionKey;
+    selectElement.appendChild(optionElement);
+  });
+
+  selectElement.addEventListener("change", handleSelectChange);
+
+  updateChart();
+</script>

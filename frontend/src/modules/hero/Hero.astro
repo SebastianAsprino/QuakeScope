@@ -1,0 +1,43 @@
+---
+import HeroVideo from '@assets/utils/HeroVideo.mp4'
+import ImageOpt from '@modules/Core/Components/imageOpt.astro'
+---
+
+<section class=" w-[99vw] h-[100vh] hero ">
+    <div  class="absolute inset-0 flex flex-col items-center justify-center bottom-24 z-40 animate-zoom-in">
+        <ImageOpt  type='full' quality='high' version='white' width={1000}/>
+        
+    </div>
+    <div class="absolute inset-0 h-[100vh] bg-black bg-opacity-70 z-10 "></div>
+    <video 
+    class="w-full h-full object-cover"
+    src={HeroVideo}
+    playsinline
+    autoplay
+    loop
+    muted
+    />
+
+</section>
+<style>
+    .hero{
+        animation: scrollAnimation linear both;
+        animation-duration: 2.5ms; 
+        animation-direction: alternate;
+        animation-timeline: scroll();
+        animation-range: 0 150px;
+        
+    }
+    @keyframes scrollAnimation {
+        from {
+            transform: scale(1);
+            
+         
+        }
+        to {
+            transform: scale(0.9);
+            
+        }
+        
+    }
+</style>

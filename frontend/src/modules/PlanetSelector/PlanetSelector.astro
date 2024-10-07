@@ -1,0 +1,420 @@
+---
+
+---
+
+<section class="bento-grid mx-40">
+  <div class="bento-item" style="--grid-span: 1;">
+    <div class="flex justify-center items-center m-4">
+      <h2 id="title">Choose the StelarBody:</h2>
+    </div>
+    <div id="planet" class="planet-container"></div>
+    <div class="w-full flex pt-4 justify-center">
+      <button id="switchButton" class="" onclick="switchPlanet()">Switch</button
+      >
+    </div>
+  </div>
+
+  <div class="bento-item" style="--grid-span: 2;">
+    <section class="flex flex-col justify-center">
+      <canvas id="myChart"></canvas>
+      <label class="select" for="slct">
+        <select id="slct" required="required">
+          <option value="" disabled="disabled" selected="selected"
+            >Select option</option
+          >
+        </select>
+        <svg>
+          <use xlink:href="#select-arrow-down"></use>
+        </svg>
+      </label>
+      <!-- SVG Sprites-->
+      <svg class="sprites">
+        <symbol id="select-arrow-down">
+          <polyline points="1 1 5 5 9 1"></polyline>
+        </symbol>
+      </svg>
+    </section>
+  </div>
+
+  <div class="bento-item" style="--grid-span: 1;">
+    <h2>Other Celestial Bodies</h2>
+    <p>
+      Explore various celestial bodies in our solar system, including Mars,
+      Jupiter, and more!
+    </p>
+  </div>
+</section>
+
+<style>
+  /* Style The Dropdown Button */
+  .chart-container {
+    /* max-width: 800px;  */
+    margin: 0 auto;
+  }
+  .select {
+    position: relative;
+    min-width: 200px;
+  }
+  .select svg {
+    position: absolute;
+    right: 12px;
+    top: calc(50% - 3px);
+    width: 10px;
+    height: 6px;
+    stroke-width: 2px;
+    stroke: #9098a9;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+  }
+  .select select {
+    -webkit-appearance: none;
+    padding: 7px 40px 7px 12px;
+    width: 100%;
+    border: 1px solid #e8eaed;
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: 0 1px 3px -2px #9098a9;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 16px;
+    transition: all 150ms ease;
+  }
+  .select select:required:invalid {
+    color: #5a667f;
+  }
+  .select select option {
+    color: #223254;
+  }
+  .select select option[value=""][disabled] {
+    display: none;
+  }
+  .select select:focus {
+    outline: none;
+    border-color: #07f;
+    box-shadow: 0 0 0 2px rgba(0, 119, 255, 0.2);
+  }
+  .select select:hover + svg {
+    stroke: #07f;
+  }
+  .sprites {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px; /* Espacio entre los elementos */
+    padding: 20px;
+    background-color: var(--background-color); /* Fondo del grid */
+  }
+
+  .bento-item {
+    background-color: var(--card-background); /* Fondo de la tarjeta */
+    color: var(--text-color); /* Texto blanco */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s;
+    grid-column: span var(--grid-span);
+  }
+
+  .bento-item:hover {
+    transform: scale(1.05); /* Efecto de hover */
+  }
+
+  .planet-container {
+    height: 200px; /* Ajusta según el tamaño deseado */
+    position: relative;
+    overflow: hidden; /* Evita que el canvas sobresalga */
+  }
+
+  .planet-container canvas {
+    width: 100%;
+    height: 100%;
+    display: block; /* Asegura que el canvas no tenga espacios vacíos */
+  }
+</style>
+<script>
+  import * as THREE from "three";
+  import Chart from "chart.js/auto";
+  import luna1 from "../../assets/luna/xa.s16.00.mhz.1973-08-25HR00_evid00443.json";
+  import luna2 from "../../assets/luna/xa.s16.00.mhz.1975-03-26HR00_evid00186.json";
+  import luna3 from "../../assets/luna/xa.s16.00.mhz.1977-04-17HR00_evid00249.json";
+  
+  document.addEventListener("astro:page-load", () => {
+    let moonSelected = true;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (!reducedMotion.matches) {
+      const $planet = document.getElementById("planet");
+      const $title = document.getElementById("title");
+      if (moonSelected) {
+        $title!.textContent = "Choose the StelarBody: Moon";
+      } else {
+        $title!.textContent = "Choose the StelarBody: Mars";
+      }
+      const $switchButton = document.getElementById("switchButton");
+      $switchButton?.addEventListener("click", () => {
+        moonSelected = !moonSelected;
+        switchCelestialBody();
+        updateOptions(); // Actualiza las opciones del select
+        updateChart();
+      });
+
+      let w = $planet!.offsetWidth;
+      let h = $planet!.offsetHeight;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(85, w / h, 0.08, 4000);
+      camera.position.z = 15;
+      scene.add(camera);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(w, h);
+      renderer.setClearColor(0x00000, 1);
+
+      $planet?.appendChild(renderer.domElement);
+
+      const light = new THREE.DirectionalLight(0xffffff, 0.8);
+      light.position.set(1, 1, 1);
+      light.castShadow = true;
+      //Set up shadow properties for the light
+      light.shadow.mapSize.width = 512; // default
+      light.shadow.mapSize.height = 512; // default
+      light.shadow.camera.near = 0.5; // default
+      light.shadow.camera.far = 500; // default
+      scene.add(light);
+      const loader = new THREE.TextureLoader();
+      loader.crossOrigin = "";
+      let moonSphere: any, marsSphere: any;
+
+      loader.load("/Moon.jpg", (texture) => {
+        const geometry = new THREE.SphereGeometry(5, 32, 32);
+        const material = new THREE.MeshStandardMaterial({ map: texture });
+
+        moonSphere = new THREE.Mesh(geometry, material);
+        moonSphere.castShadow = true; //default is false
+        scene.add(moonSphere);
+        animate();
+      });
+
+      loader.load("/Mars.webp", (texture) => {
+        const geometry = new THREE.SphereGeometry(5, 42, 32);
+        const material = new THREE.MeshStandardMaterial({ map: texture });
+        marsSphere = new THREE.Mesh(geometry, material);
+        marsSphere.castShadow = true; //default is false
+        marsSphere.position.x = 100;
+        scene.add(marsSphere);
+      });
+
+      function animate() {
+        requestAnimationFrame(animate);
+        if (moonSphere) moonSphere.rotation.y += 0.001;
+        if (marsSphere) marsSphere.rotation.y += 0.001;
+        renderer.render(scene, camera);
+      }
+
+      function switchCelestialBody() {
+        const duration = 1000; // Duration of the transition in milliseconds
+        const start = performance.now();
+        if (moonSelected) {
+          $title!.textContent = "Choose the StelarBody: Moon";
+        } else {
+          $title!.textContent = "Choose the StelarBody: Mars";
+        }
+        const initialMoonX = moonSphere.position.x;
+        const initialMarsX = marsSphere.position.x;
+        const targetMoonX = moonSelected ? 0 : -100;
+        const targetMarsX = moonSelected ? 100 : 0;
+
+        function animateTransition(now: any) {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / duration, 1);
+
+          moonSphere.position.x =
+            initialMoonX + (targetMoonX - initialMoonX) * progress;
+          marsSphere.position.x =
+            initialMarsX + (targetMarsX - initialMarsX) * progress;
+
+          if (progress < 1) {
+            requestAnimationFrame(animateTransition);
+          }
+        }
+
+        requestAnimationFrame(animateTransition);
+      }
+
+      function resize() {
+        h = $planet!.offsetHeight;
+        w = $planet!.offsetWidth;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
+
+      window.addEventListener("resize", resize);
+    }
+    let chartInstance: Chart | null = null;
+
+    const options = {
+      luna: {
+        luna1: luna1,
+        luna2: luna2,
+        luna3: luna3,
+      },
+      marte: {
+        marte1: {
+          time: [1, 2, 3, 4],
+          vel: [10, 20, 30, 40],
+          sismo_start: 2,
+          sismo_end: 4,
+        },
+      },
+    };
+
+    const lunaOptions = Object.keys(options.luna);
+    var selectedOption = options.luna.luna1;
+    if (moonSelected) {
+      selectedOption = options.luna.luna1;
+    } else {
+      selectedOption = options.marte.marte1;
+    }
+
+    function updateChart() {
+      const lineCanvas = document.getElementById(
+        "myChart"
+      ) as HTMLCanvasElement | null;
+
+      if (lineCanvas) {
+        const ctx = lineCanvas.getContext("2d");
+
+        if (ctx) {
+          // Destruir el gráfico anterior si existe
+          if (chartInstance) {
+            chartInstance.destroy();
+          }
+
+          const config: any = {
+            type: "line",
+            data: {
+              labels: selectedOption.time,
+              datasets: [
+                {
+                  label: "Luna",
+                  data: selectedOption.vel,
+                  fill: false,
+                  borderColor: "rgba(255, 99, 132, 1)",
+                  pointRadius: 0,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                title: {
+                  display: true,
+                  text: "Seismic Luna",
+                },
+              },
+            },
+            plugins: [
+              {
+                afterDraw: (chart: any) => {
+                  const ctx = chart.ctx;
+                  const xAxis = chart.scales.x;
+                  const yAxis = chart.scales.y;
+
+                  const sismoStart = selectedOption.time.findIndex(
+                    (time: number) => time >= selectedOption.sismo_start
+                  );
+                  const sismoEnd = selectedOption.time.findIndex(
+                    (time: number) => time >= selectedOption.sismo_end
+                  );
+                  const indices = [sismoStart, sismoEnd];
+
+                  if (indices.length > 0 && xAxis) {
+                    indices.forEach((index: number) => {
+                      const xValue = selectedOption.time.find(
+                        (time: number) => time >= index
+                      );
+
+                      if (xValue !== undefined) {
+                        const pixelPosition = xAxis.getPixelForValue(xValue);
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(pixelPosition, yAxis.top);
+                        ctx.lineTo(pixelPosition, yAxis.bottom);
+                        ctx.strokeStyle = "red";
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        ctx.restore();
+                      }
+                    });
+                  }
+                },
+              },
+            ],
+          };
+
+          // Crear una nueva instancia del gráfico y guardarla
+          chartInstance = new Chart(ctx, config);
+        }
+      }
+    }
+
+    const selectElement = document.getElementById("slct") as HTMLSelectElement;
+
+    lunaOptions.forEach((optionKey) => {
+      const optionElement = document.createElement("option");
+      optionElement.value = optionKey;
+      optionElement.textContent = optionKey;
+      selectElement.appendChild(optionElement);
+    });
+
+    selectElement.addEventListener("change", handleSelectChange);
+    function updateOptions() {
+      // Limpiar las opciones existentes
+      selectElement.innerHTML = "";
+
+      // Establecer las opciones de luna o marte según el estado de isMoonSelected
+      const currentOptions = moonSelected ? options.luna : options.marte;
+      const currentLunaOptions = Object.keys(currentOptions);
+
+      currentLunaOptions.forEach((optionKey) => {
+        const optionElement = document.createElement("option");
+        optionElement.value = optionKey;
+        optionElement.textContent = optionKey;
+        selectElement.appendChild(optionElement);
+      });
+
+      // Actualizar selectedOption dependiendo de isMoonSelected
+      selectedOption = moonSelected ? options.luna.luna1 : options.marte.marte1;
+    }
+
+    function handleSelectChange(event: Event) {
+      const selectElement = event.target as HTMLSelectElement;
+      const selectedValue = selectElement.value;
+      
+      selectedOption = moonSelected
+        ? // @ts-ignore
+          options.luna[selectedValue]
+        : // @ts-ignore
+          options.marte[selectedValue];
+      updateChart();
+    }
+
+    // Llama a updateOptions para inicializar el select
+    updateOptions();
+
+    // Escuchar cambios en el select
+    selectElement.addEventListener("change", handleSelectChange);
+
+    // Llama a updateChart para renderizar el gráfico inicialmente
+    updateChart();
+  });
+</script>

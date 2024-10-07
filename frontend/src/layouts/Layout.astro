@@ -4,35 +4,44 @@ interface Props {
 }
 
 const { title } = Astro.props;
-import NavigationBar from '@modules/NavigationBar/NavigationBar';
+import NavigationBar from "@modules/NavigationBar";
+import { ViewTransitions } from "astro:transitions";
+import "@fontsource-variable/montserrat";
 ---
 
-<!doctype html> 
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="description" content="Astro description" />
-  <meta name="viewport" content="width=device-width" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <title>{title}</title>
-</head>
+  <head>
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Astro description" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <ViewTransitions />
+  </head>
 
-<body>
-  <NavigationBar />
-  <main>  
-    <slot />
-  </main>
-  
-</body>
+  <body>
+    <NavigationBar client:only="react" />
+    <main>
+      <slot />
+    </main>
+  </body>
 </html>
+<style>
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+</style>
 <style is:global>
+  
   :root {
     --md-sys-color-primary: rgb(255, 249, 249);
     --md-sys-color-surface-tint: rgb(255, 179, 174);
     --md-sys-color-on-primary: rgb(0, 0, 0);
     --md-sys-color-primary-container: rgb(255, 185, 181);
     --md-sys-color-on-primary-container: rgb(0, 0, 0);
-    --md-sys-color-secondary: rgb(252, 250, 255); 
+    --md-sys-color-secondary: rgb(252, 250, 255);
     --md-sys-color-on-secondary: rgb(0, 0, 0);
     --md-sys-color-secondary-container: rgb(190, 200, 255);
     --md-sys-color-on-secondary-container: rgb(0, 0, 0);
@@ -76,31 +85,77 @@ import NavigationBar from '@modules/NavigationBar/NavigationBar';
     --md-sys-color-surface-container: rgb(26, 33, 33);
     --md-sys-color-surface-container-high: rgb(37, 43, 43);
     --md-sys-color-surface-container-highest: rgb(47, 54, 54);
+    --md-sys-color-inverse-primary-transparent: rgba(78, 23, 23, 0.873);
   }
-  
+
   html {
-    font-family: system-ui, sans-serif;
     background: var(--md-sys-color-background);
     color: var(--md-sys-color-on-background);
+
+    scroll-behavior: smooth;
+    font-family: "Montserrat Variable", sans-serif;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  .lenis.lenis-smooth iframe {
+    pointer-events: none;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    backdrop-filter: blur(10px);
+    border-radius: 5px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    border-radius: 5px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: var(--md-sys-color-on-surface);
   }
-  
-  p, span, div {
+
+  p,
+  span,
+  div {
     color: var(--md-sys-color-on-background);
   }
-  
+
   a {
     color: var(--md-sys-color-primary);
     text-decoration: none;
   }
-  
+
   a:hover {
     color: var(--md-sys-color-surface-tint);
   }
-  
+
   button {
     background-color: var(--md-sys-color-primary-container);
     color: var(--md-sys-color-on-primary-container);
@@ -109,30 +164,45 @@ import NavigationBar from '@modules/NavigationBar/NavigationBar';
     border-radius: 5px;
     cursor: pointer;
   }
-  
+
   button:hover {
     background-color: var(--md-sys-color-surface-container-high);
   }
-  
-  input, textarea {
+
+  input,
+  textarea {
     background-color: var(--md-sys-color-surface-container);
     color: var(--md-sys-color-on-surface);
     border: 1px solid var(--md-sys-color-outline);
     padding: 10px;
     border-radius: 4px;
   }
-  
-  input:focus, textarea:focus {
+
+  input:focus,
+  textarea:focus {
     outline: none;
     border-color: var(--md-sys-color-outline-variant);
   }
-  
+
   code {
-    font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
     background-color: var(--md-sys-color-surface-container);
     padding: 5px;
     border-radius: 3px;
     color: var(--md-sys-color-on-surface-variant);
   }
-  
 </style>
+<script>
+  import Lenis from "lenis";
+  const lenis = new Lenis();
+
+  lenis.on("scroll", (e) => {
+    console.log(e);
+  });
+
+  function raf(time: any) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+
+  requestAnimationFrame(raf);
+</script>

@@ -4,21 +4,23 @@ import QuakeScopeLowWhite from "@assets/Brand/QuakeScopeReducedWhiteVersionLowQu
 import QuakeScopeLowBlack from "@assets/Brand/QuakeScopeReducedBlackVersionLowQuality.webp"
 import QuakeScopeHighWhite from "@assets/Brand/QuakeScopeReducedWhiteVersionHighQuality.webp"
 import QuakeScopeHighBlack from "@assets/Brand/QuakeScopeReducedBlackVersionHighQuality.webp"
+import QuakeScopeCompletedHighWhite from "@assets/Brand/QuakeScopeCompleteWhiteVersionHighQuality.webp"
 interface Props {
     quality: "low" | "medium" | "high";
     version: "white" | "black";
     type: "min" | "full";
     width?: number; 
+    classes?: string;
 }
 
-const { quality, version, type, width } = Astro.props;
+const { quality, version, type, width, classes } = Astro.props;
 
 
 ---
 
 
-{quality === "low" && version === "white" && <Image src={QuakeScopeLowWhite} alt="QuakeScopeWhite" width={width}/>}
-{quality === "low" && version === "black" && <Image src={QuakeScopeLowBlack} alt="QuakeScopeBlack" width={width}/> }
-{quality === "high" && version === "white" && <Image src={QuakeScopeHighWhite} alt="QuakeScopeWhite" width={width}/>}
-{quality === "high" && version === "black" && <Image src={QuakeScopeHighBlack} alt="QuakeScopeBlack" width={width}/> }
-
+{quality === "low" && version === "white" && type === "min" && <Image src={QuakeScopeLowWhite} alt="QuakeScopeWhite" width={width} class={classes}/>}
+{quality === "low" && version === "black" && type === "min" && <Image src={QuakeScopeLowBlack} alt="QuakeScopeBlack" width={width} class={classes}/> }
+{quality === "high" && version === "white" && type === "min" && <Image src={QuakeScopeHighWhite} alt="QuakeScopeWhite" width={width} class={classes}/>}
+{quality === "high" && version === "black" && type === "min" && <Image src={QuakeScopeHighBlack} alt="QuakeScopeBlack" width={width} class={classes}/> }
+{quality === "high" && version === "white" && type === "full" && <Image src={QuakeScopeCompletedHighWhite} alt="QuakeScopeWhite" width={width} class={classes}/>}

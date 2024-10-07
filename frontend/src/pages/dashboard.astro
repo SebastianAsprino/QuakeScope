@@ -1,0 +1,14 @@
+---
+import PlanetSelector from "@modules/PlanetSelector/PlanetSelector.astro";
+import Layout from "src/layouts/Layout.astro";
+import ImageOpt from "@modules/Core/Components/imageOpt.astro";
+---
+
+<Layout title="Dashboard Data">
+  <div class="fixed right-8 top-4">
+    <ImageOpt type="min" quality="high" version="white" width={100} />
+  </div>
+  <section class="">
+    <PlanetSelector />
+  </section>
+</Layout>

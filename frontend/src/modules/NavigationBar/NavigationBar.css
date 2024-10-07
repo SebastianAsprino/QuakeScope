@@ -1,0 +1,10 @@
+.toggleButton {
+  position: fixed;
+  left: 2rem;
+  top: 2rem;
+  transition: all 0.3s;
+}
+
+.opened{
+    left: 10rem;
+}
