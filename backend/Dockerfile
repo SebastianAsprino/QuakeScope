@@ -1,30 +1,36 @@
-FROM python:3-alpine AS builder
- 
+FROM oven/bun AS build
+
 WORKDIR /
+
+# Cache packages installation
+COPY package.json package.json
+COPY bun.lockb bun.lockb
+
+RUN bun install
 
 COPY ./ ./
 
-RUN python3 -m venv venv
-ENV VIRTUAL_ENV=/venv
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
- 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
- 
-# Stage 2
-FROM python:3-alpine AS runner
- 
+ENV NODE_ENV=production
+
+
+RUN bun build \
+	--compile \
+	--minify-whitespace \
+	--minify-syntax \
+	--target bun \
+	--outfile server \
+	./src/index.ts
+
+FROM gcr.io/distroless/base
+
 WORKDIR /
- 
-COPY --from=builder /venv venv
 
-COPY ./ ./
+COPY --from=build /server server
 
-COPY main.py main.py
- 
-ENV VIRTUAL_ENV=/venv
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
- 
+
+
+ENV NODE_ENV=production
+
+CMD ["./server"]
+
 EXPOSE 8000
- 
-CMD [ "uvicorn", "--host", "0.0.0.0", "main:app" ]
