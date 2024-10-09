@@ -27,6 +27,7 @@ WORKDIR /
 
 COPY --from=build /server server
 
+COPY ./data ./data
 
 
 ENV NODE_ENV=production
