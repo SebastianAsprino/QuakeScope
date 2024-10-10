@@ -143,46 +143,6 @@
 <script>
   import * as THREE from "three";
   import Chart from "chart.js/auto";
-  import luna1 from "../../assets/luna/xa.s12.00.mhz.1969-12-16HR00_evid00006.json";
-  import luna2 from "../../assets/luna/xa.s12.00.mhz.1970-05-20HR00_evid00026.json";
-  import luna3 from "../../assets/luna/xa.s12.00.mhz.1970-05-23HR00_evid00027.json";
-  import luna4 from "../../assets/luna/xa.s12.00.mhz.1970-07-27HR00_evid00039.json";
-  import luna5 from "../../assets/luna/xa.s12.00.mhz.1970-09-09HR00_evid00043.json";
-  import luna6 from "../../assets/luna/xa.s12.00.mhz.1971-01-05HR00_evid00059.json";
-  import luna7 from "../../assets/luna/xa.s12.00.mhz.1971-03-15HR00_evid00073.json";
-  import luna8 from "../../assets/luna/xa.s12.00.mhz.1971-04-08HR01_evid00083.json";
-  import luna9 from "../../assets/luna/xa.s12.00.mhz.1971-06-11HR00_evid00096.json";
-  import luna10 from "../../assets/luna/xa.s12.00.mhz.1971-10-26HR00_evid00133.json";
-  import luna11 from "../../assets/luna/xa.s12.00.mhz.1971-11-24HR00_evid00156.json";
-  import luna12 from "../../assets/luna/xa.s12.00.mhz.1972-01-26HR00_evid00186.json";
-  // import luna13 from "../../assets/luna";
-  // import luna14 from "../../assets/luna";
-  // import luna15 from "../../assets/luna";
-  // import luna16 from "../../assets/luna";
-  // import luna17 from "../../assets/luna";
-  // import luna18 from "../../assets/luna";
-  // import luna19 from "../../assets/luna";
-  // import luna20 from "../../assets/luna";
-  // import luna21 from "../../assets/luna";
-  // import luna22 from "../../assets/luna";
-  // import luna23 from "../../assets/luna";
-  // import luna24 from "../../assets/luna";
-  // import luna25 from "../../assets/luna";
-  // import luna26 from "../../assets/luna";
-  // import luna27 from "../../assets/luna";
-  // import luna28 from "../../assets/luna";
-  // import luna29 from "../../assets/luna";
-  // import luna30 from "../../assets/luna";
-  // import luna31 from "../../assets/luna";
-  // import luna32 from "../../assets/luna";
-  // import luna33 from "../../assets/luna";
-  // import luna34 from "../../assets/luna";
-  // import luna35 from "../../assets/luna";
-  // import luna36 from "../../assets/luna";
-  // import luna37 from "../../assets/luna";
-  // import luna38 from "../../assets/luna";
-  // import luna39 from "../../assets/luna";
-  // import luna40 from "../../assets/luna";
   
   document.addEventListener("astro:page-load", () => {
     let moonSelected = true;
@@ -300,46 +260,12 @@
 
     const options = {
       luna: {
-        luna1: luna1,
-        luna2: luna2,
-        luna3: luna3,
-        luna4: luna4,
-        luna5: luna5,
-        luna6: luna6,
-        luna7: luna7,
-        luna8: luna8,
-        luna9: luna9,
-        luna10: luna10,
-        luna11: luna11,
-        luna12: luna12,
-        // luna13: luna13,
-        // luna14: luna14,
-        // luna15: luna15,
-        // luna16: luna16,
-        // luna17: luna17,
-        // luna18: luna18,
-        // luna19: luna19,
-        // luna20: luna20,
-        // luna21: luna21,
-        // luna22: luna22,
-        // luna23: luna23,
-        // luna24: luna24,
-        // luna25: luna25,
-        // luna26: luna26,
-        // luna27: luna27,
-        // luna28: luna28,
-        // luna29: luna29,
-        // luna30: luna30,
-        // luna31: luna31,
-        // luna32: luna32,
-        // luna33: luna33,
-        // luna34: luna34,
-        // luna35: luna35,
-        // luna36: luna36,
-        // luna37: luna37,
-        // luna38: luna38,
-        // luna39: luna39,
-        // luna40: luna40
+        luna1: {
+          time: [1, 2, 3, 4],
+          vel: [10, 20, 30, 40],
+          sismo_start: 2,
+          sismo_end: 4,
+        },
       },
       marte: {
         marte1: {
