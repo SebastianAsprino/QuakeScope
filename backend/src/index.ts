@@ -1,4 +1,6 @@
 import { Elysia } from "elysia";
+import { cors } from '@elysiajs/cors'
+
 import * as fs from 'fs/promises';
 
 const FileName: Record<string, string> = {
@@ -62,6 +64,16 @@ async function imageExists(filePath: string) {
 }
 
 const app = new Elysia()
+.use(cors({
+  origin: '*', // Permite todas las solicitudes. Puedes cambiar '*' por dominios específicos.
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'], // Encabezados permitidos
+  credentials: true // Permitir envío de cookies en solicitudes CORS
+}))
+.headers({
+  "X-Powered-By": "Elysia",
+})
+
 .get("/json",() => FileName)
 .get("/json/:id", async ({ params: { id }, set }) => {
   const fileName = FileName[id];
