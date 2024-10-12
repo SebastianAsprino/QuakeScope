@@ -1,14 +1,235 @@
 ---
-import PlanetSelector from "@modules/PlanetSelector/PlanetSelector.astro";
+import Grid from "@modules/Grid/Grid";
 import Layout from "src/layouts/Layout.astro";
 import ImageOpt from "@modules/Core/Components/imageOpt.astro";
+let moonSelected = true;
 ---
 
 <Layout title="Dashboard Data">
   <div class="fixed right-8 top-4">
     <ImageOpt type="min" quality="high" version="white" width={100} />
   </div>
-  <section class="">
-    <PlanetSelector />
+  <section class=" flex flex-col justify-center items-center gap-11">
+    <section class=" w-96 h-auto">
+      <div class="flex justify-center items-center m-4">
+        <h2 id="title">Choose the StelarBody:</h2>
+      </div>
+      <div id="planet" class="planet-container"></div>
+      <div class="w-full flex pt-4 justify-center">
+        <button id="switchButton" class="">Switch</button>
+      </div>
+    </section>
+    <section>
+      <Grid client:only="react" planetEnv="Moon"/>
+    </section>
   </section>
 </Layout>
+<style>
+  /* Style The Dropdown Button */
+
+  .select {
+    position: relative;
+    min-width: 200px;
+  }
+  .select svg {
+    position: absolute;
+    right: 12px;
+    top: calc(50% - 3px);
+    width: 10px;
+    height: 6px;
+    stroke-width: 2px;
+    stroke: #9098a9;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+  }
+  .select select {
+    -webkit-appearance: none;
+    padding: 7px 40px 7px 12px;
+    width: 100%;
+    border: 1px solid #e8eaed;
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: 0 1px 3px -2px #9098a9;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 16px;
+    transition: all 150ms ease;
+  }
+  .select select:required:invalid {
+    color: #5a667f;
+  }
+  .select select option {
+    color: #223254;
+  }
+  .select select option[value=""][disabled] {
+    display: none;
+  }
+  .select select:focus {
+    outline: none;
+    border-color: #07f;
+    box-shadow: 0 0 0 2px rgba(0, 119, 255, 0.2);
+  }
+  .select select:hover + svg {
+    stroke: #07f;
+  }
+  .sprites {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px; /* Espacio entre los elementos */
+    padding: 20px;
+    background-color: var(--background-color); /* Fondo del grid */
+  }
+
+  .bento-item {
+    background-color: var(--card-background); /* Fondo de la tarjeta */
+    color: var(--text-color); /* Texto blanco */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s;
+    grid-column: span var(--grid-span);
+  }
+
+  .bento-item:hover {
+    transform: scale(1.05); /* Efecto de hover */
+  }
+
+  .planet-container {
+    height: 200px; /* Ajusta según el tamaño deseado */
+    position: relative;
+    overflow: hidden; /* Evita que el canvas sobresalga */
+  }
+
+  .planet-container canvas {
+    width: 100%;
+    height: 100%;
+    display: block; /* Asegura que el canvas no tenga espacios vacíos */
+  }
+</style>
+<script>
+  import * as THREE from "three";
+
+  document.addEventListener("astro:page-load", () => {
+    let moonSelected = true;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (!reducedMotion.matches) {
+      const $planet = document.getElementById("planet");
+      const $title = document.getElementById("title");
+      if (moonSelected) {
+        $title!.textContent = "Choose the StelarBody: Moon";
+      } else {
+        $title!.textContent = "Choose the StelarBody: Mars";
+      }
+      const $switchButton = document.getElementById("switchButton");
+      $switchButton?.addEventListener("click", () => {
+        moonSelected = !moonSelected;
+        const stelarBody = moonSelected ? "Moon" : "Mars";
+
+        switchCelestialBody();
+      });
+
+      let w = $planet!.offsetWidth;
+      let h = $planet!.offsetHeight;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(85, w / h, 0.08, 4000);
+      camera.position.z = 15;
+      scene.add(camera);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(w, h);
+      renderer.setClearColor(0x00000, 1);
+
+      $planet?.appendChild(renderer.domElement);
+
+      const light = new THREE.DirectionalLight(0xffffff, 0.8);
+      light.position.set(1, 1, 1);
+      light.castShadow = true;
+      //Set up shadow properties for the light
+      light.shadow.mapSize.width = 512; // default
+      light.shadow.mapSize.height = 512; // default
+      light.shadow.camera.near = 0.5; // default
+      light.shadow.camera.far = 500; // default
+      scene.add(light);
+      const loader = new THREE.TextureLoader();
+      loader.crossOrigin = "";
+      let moonSphere: any, marsSphere: any;
+
+      loader.load("/Moon.jpg", (texture) => {
+        const geometry = new THREE.SphereGeometry(5, 32, 32);
+        const material = new THREE.MeshStandardMaterial({ map: texture });
+
+        moonSphere = new THREE.Mesh(geometry, material);
+        moonSphere.castShadow = true; //default is false
+        scene.add(moonSphere);
+        animate();
+      });
+
+      loader.load("/Mars.webp", (texture) => {
+        const geometry = new THREE.SphereGeometry(5, 42, 32);
+        const material = new THREE.MeshStandardMaterial({ map: texture });
+        marsSphere = new THREE.Mesh(geometry, material);
+        marsSphere.castShadow = true; //default is false
+        marsSphere.position.x = 100;
+        scene.add(marsSphere);
+      });
+
+      function animate() {
+        requestAnimationFrame(animate);
+        if (moonSphere) moonSphere.rotation.y += 0.001;
+        if (marsSphere) marsSphere.rotation.y += 0.001;
+        renderer.render(scene, camera);
+      }
+
+      function switchCelestialBody() {
+        const duration = 1000; // Duration of the transition in milliseconds
+        const start = performance.now();
+        if (moonSelected) {
+          $title!.textContent = "Choose the StelarBody: Moon";
+        } else {
+          $title!.textContent = "Choose the StelarBody: Mars";
+        }
+        const initialMoonX = moonSphere.position.x;
+        const initialMarsX = marsSphere.position.x;
+        const targetMoonX = moonSelected ? 0 : -100;
+        const targetMarsX = moonSelected ? 100 : 0;
+
+        function animateTransition(now: any) {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / duration, 1);
+
+          moonSphere.position.x =
+            initialMoonX + (targetMoonX - initialMoonX) * progress;
+          marsSphere.position.x =
+            initialMarsX + (targetMarsX - initialMarsX) * progress;
+
+          if (progress < 1) {
+            requestAnimationFrame(animateTransition);
+          }
+        }
+
+        requestAnimationFrame(animateTransition);
+      }
+
+      function resize() {
+        h = $planet!.offsetHeight;
+        w = $planet!.offsetWidth;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
+
+      window.addEventListener("resize", resize);
+    }
+  });
+</script>
