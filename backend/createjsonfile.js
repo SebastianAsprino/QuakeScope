@@ -11,10 +11,13 @@ fs.readdir(dataFolder, (err, files) => {
     return;
   }
 
-  // Crear el objeto con el formato [1: "archivo1", 2: "archivo2", ...]
+  // Crear el objeto con el formato [1: "archivo1.json", 2: "archivo2.json", ...]
   const result = {};
   files.forEach((file, index) => {
-    result[index + 1] = file;
+    // Verifica si el archivo tiene extensión .json
+    if (path.extname(file) === '.json') {
+      result[index + 1] = file;
+    }
   });
 
   // Convertir el objeto a JSON
